@@ -1,0 +1,810 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Health Pharmacy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1e5c1e;
+    --green-mid: #2e7d32;
+    --green-bright: #43a047;
+    --green-light: #c8e6c9;
+    --green-pale: #f1f8f1;
+    --red-cross: #c62828;
+    --red-light: #ffebee;
+    --black: #111111;
+    --charcoal: #2a2a2a;
+    --gray-dark: #555;
+    --gray-mid: #888;
+    --gray-light: #e8e8e8;
+    --gray-pale: #f7f7f5;
+    --white: #ffffff;
+    --silver: #b0b0b0;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Sans 3', sans-serif;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.16);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-body); color: var(--charcoal); background: var(--white); font-size: 16px; line-height: 1.6; }
+
+  /* NAV */
+  nav {
+    background: var(--white);
+    border-bottom: 2px solid var(--green-light);
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 72px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-icon {
+    width: 44px; height: 44px; background: var(--green-mid);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    position: relative; flex-shrink: 0;
+  }
+  .logo-cross {
+    width: 20px; height: 20px; position: relative;
+  }
+  .logo-cross::before, .logo-cross::after {
+    content: ''; position: absolute; background: white; border-radius: 2px;
+  }
+  .logo-cross::before { width: 6px; height: 20px; left: 7px; top: 0; }
+  .logo-cross::after { width: 20px; height: 6px; left: 0; top: 7px; }
+  .logo-text { line-height: 1.1; }
+  .logo-text .daily { font-family: var(--font-display); font-size: 18px; font-weight: 900; color: var(--black); letter-spacing: -0.5px; }
+  .logo-text .health { font-family: var(--font-display); font-size: 18px; font-weight: 900; color: var(--black); }
+  .logo-text .pharmacy { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--green-mid); letter-spacing: 1px; text-transform: uppercase; }
+  .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--charcoal); font-weight: 600; font-size: 14px; transition: color 0.2s; letter-spacing: 0.3px; }
+  .nav-links a:hover { color: var(--green-mid); }
+  .nav-links a.active { color: var(--green-mid); border-bottom: 2px solid var(--green-mid); padding-bottom: 2px; }
+  .nav-cta {
+    background: var(--green-mid); color: white !important;
+    padding: 8px 20px; border-radius: 6px;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--green-dark) !important; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--green-pale) 0%, #e8f5e9 50%, #f9fbe7 100%);
+    padding: 5rem 2rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; right: -80px; top: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(46,125,50,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-light); color: var(--green-dark);
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.5px; margin-bottom: 1.5rem;
+  }
+  .hero-badge span { width: 8px; height: 8px; background: var(--green-mid); border-radius: 50%; display: inline-block; }
+  .hero h1 { font-family: var(--font-display); font-size: 3.2rem; font-weight: 900; color: var(--black); line-height: 1.1; margin-bottom: 1.25rem; letter-spacing: -1px; }
+  .hero h1 em { color: var(--green-mid); font-style: normal; }
+  .hero p { font-size: 1.1rem; color: var(--gray-dark); margin-bottom: 2rem; line-height: 1.7; max-width: 480px; }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--green-mid); color: white;
+    padding: 14px 28px; border-radius: 8px; border: none;
+    font-family: var(--font-body); font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(46,125,50,0.3); }
+  .btn-secondary {
+    background: white; color: var(--green-mid);
+    padding: 14px 28px; border-radius: 8px; border: 2px solid var(--green-mid);
+    font-family: var(--font-body); font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { background: var(--green-pale); }
+
+  .hero-card-wrap { display: flex; justify-content: center; }
+  .hero-card {
+    background: white; border-radius: var(--radius-lg); padding: 2rem;
+    box-shadow: var(--shadow-lg); max-width: 340px; width: 100%;
+    border: 1px solid var(--green-light);
+  }
+  .hero-card h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--black); margin-bottom: 1rem; }
+  .chat-bubble { padding: 10px 14px; border-radius: 12px; font-size: 14px; margin-bottom: 8px; max-width: 85%; }
+  .chat-bubble.bot { background: var(--green-pale); color: var(--charcoal); border-bottom-left-radius: 4px; }
+  .chat-bubble.user { background: var(--green-mid); color: white; margin-left: auto; border-bottom-right-radius: 4px; text-align: right; }
+  .chat-input-demo { display: flex; gap: 8px; margin-top: 12px; }
+  .chat-input-demo input { flex: 1; padding: 8px 12px; border: 1px solid var(--green-light); border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: var(--gray-mid); }
+  .chat-input-demo button { background: var(--green-mid); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+
+  /* FEATURES */
+  .features-section { padding: 5rem 2rem; background: var(--white); }
+  .section-label { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 0.75rem; }
+  .section-title { text-align: center; font-family: var(--font-display); font-size: 2.2rem; font-weight: 900; color: var(--black); margin-bottom: 0.75rem; }
+  .section-sub { text-align: center; color: var(--gray-dark); font-size: 1rem; max-width: 500px; margin: 0 auto 3rem; }
+  .features-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .feature-card {
+    padding: 2rem; border-radius: var(--radius-lg);
+    border: 1.5px solid var(--green-light);
+    background: var(--green-pale);
+    transition: all 0.25s;
+  }
+  .feature-card:hover { border-color: var(--green-mid); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: var(--green-mid); display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+  .feature-icon svg { width: 26px; height: 26px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .feature-card h3 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--black); margin-bottom: 0.6rem; }
+  .feature-card p { font-size: 0.9rem; color: var(--gray-dark); line-height: 1.6; }
+
+  /* STATS */
+  .stats-band { background: var(--green-mid); padding: 3.5rem 2rem; }
+  .stats-inner { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center; }
+  .stat-num { font-family: var(--font-display); font-size: 2.8rem; font-weight: 900; color: white; line-height: 1; }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 6px; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* PRODUCTS PAGE */
+  .page-hero { background: var(--green-pale); padding: 3rem 2rem; border-bottom: 2px solid var(--green-light); }
+  .page-hero-inner { max-width: 1200px; margin: 0 auto; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: var(--black); }
+  .page-hero p { color: var(--gray-dark); margin-top: 0.5rem; font-size: 1rem; }
+
+  .products-layout { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; display: grid; grid-template-columns: 240px 1fr; gap: 2.5rem; }
+  .filter-panel { background: var(--white); border: 1.5px solid var(--green-light); border-radius: var(--radius-lg); padding: 1.5rem; height: fit-content; }
+  .filter-panel h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--black); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--green-light); }
+  .filter-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; border-radius: 6px; }
+  .filter-item input { accent-color: var(--green-mid); width: 16px; height: 16px; }
+  .filter-item label { font-size: 14px; color: var(--charcoal); cursor: pointer; }
+  .filter-item label span { font-size: 12px; color: var(--gray-mid); margin-left: 4px; }
+
+  .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .product-card {
+    background: var(--white); border: 1.5px solid var(--gray-light);
+    border-radius: var(--radius-lg); overflow: hidden;
+    transition: all 0.25s; cursor: pointer;
+  }
+  .product-card:hover { border-color: var(--green-mid); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .product-img {
+    height: 130px; background: var(--green-pale);
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--green-light);
+    position: relative;
+  }
+  .product-img svg { width: 48px; height: 48px; }
+  .product-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--green-mid); color: white;
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+  .product-badge.rx { background: var(--red-cross); }
+  .product-body { padding: 1rem; }
+  .product-cat { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 4px; }
+  .product-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--black); margin-bottom: 4px; }
+  .product-desc { font-size: 12px; color: var(--gray-mid); margin-bottom: 12px; }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; }
+  .product-price { font-family: var(--font-display); font-size: 1.2rem; font-weight: 900; color: var(--green-dark); }
+  .product-price span { font-size: 12px; font-weight: 400; color: var(--gray-mid); }
+  .add-btn {
+    background: var(--green-mid); color: white;
+    border: none; border-radius: 6px; padding: 7px 14px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .add-btn:hover { background: var(--green-dark); }
+
+  /* CHAT PAGE */
+  .chat-page-layout { max-width: 860px; margin: 0 auto; padding: 3rem 2rem; }
+  .chat-header-card { background: var(--green-pale); border: 1.5px solid var(--green-light); border-radius: var(--radius-lg); padding: 1.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .chat-avatar { width: 52px; height: 52px; background: var(--green-mid); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .chat-avatar svg { width: 26px; height: 26px; fill: none; stroke: white; stroke-width: 2; }
+  .chat-header-info h2 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--black); }
+  .chat-header-info p { font-size: 13px; color: var(--gray-dark); margin-top: 2px; }
+  .online-dot { width: 8px; height: 8px; background: #4caf50; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 0 3px rgba(76,175,80,0.2); }
+
+  .chat-window {
+    background: var(--white); border: 1.5px solid var(--green-light);
+    border-radius: var(--radius-lg); height: 420px;
+    overflow-y: auto; padding: 1.5rem;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .msg { max-width: 75%; display: flex; flex-direction: column; }
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg-bubble { padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; }
+  .msg.bot .msg-bubble { background: var(--green-pale); color: var(--charcoal); border-bottom-left-radius: 4px; border: 1px solid var(--green-light); }
+  .msg.user .msg-bubble { background: var(--green-mid); color: white; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 11px; color: var(--gray-mid); margin-top: 4px; }
+  .msg-sender { font-size: 11px; font-weight: 700; color: var(--green-dark); margin-bottom: 3px; letter-spacing: 0.3px; }
+
+  .chat-input-area { margin-top: 1rem; display: flex; gap: 10px; align-items: flex-end; }
+  .chat-input-area textarea {
+    flex: 1; padding: 12px 16px; border: 1.5px solid var(--green-light);
+    border-radius: 10px; font-family: var(--font-body); font-size: 14px;
+    resize: none; height: 48px; min-height: 48px;
+    color: var(--charcoal); background: var(--white);
+    transition: border-color 0.2s; line-height: 1.4;
+  }
+  .chat-input-area textarea:focus { outline: none; border-color: var(--green-mid); }
+  .send-btn {
+    background: var(--green-mid); color: white; border: none;
+    border-radius: 10px; padding: 12px 20px; cursor: pointer;
+    font-family: var(--font-body); font-weight: 700; font-size: 14px;
+    transition: background 0.2s; height: 48px;
+  }
+  .send-btn:hover { background: var(--green-dark); }
+  .send-btn:disabled { background: var(--gray-light); cursor: not-allowed; }
+
+  .quick-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip {
+    background: var(--white); border: 1.5px solid var(--green-mid);
+    color: var(--green-dark); padding: 6px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip:hover { background: var(--green-pale); }
+
+  /* CONTACT PAGE */
+  .contact-layout { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .contact-info h2 { font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: var(--black); margin-bottom: 1.5rem; }
+  .contact-item { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 1.75rem; }
+  .contact-icon { width: 46px; height: 46px; background: var(--green-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-icon svg { width: 22px; height: 22px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .contact-item h4 { font-weight: 700; color: var(--black); font-size: 14px; margin-bottom: 3px; }
+  .contact-item p { color: var(--gray-dark); font-size: 14px; line-height: 1.5; }
+
+  .hours-card { background: var(--green-pale); border: 1.5px solid var(--green-light); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 2rem; }
+  .hours-card h3 { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--black); margin-bottom: 1rem; }
+  .hours-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--green-light); font-size: 13.5px; }
+  .hours-row:last-child { border-bottom: none; }
+  .hours-row .day { color: var(--gray-dark); }
+  .hours-row .time { font-weight: 600; color: var(--charcoal); }
+  .open-now { color: var(--green-mid); font-weight: 700; font-size: 12px; background: var(--green-light); padding: 2px 8px; border-radius: 4px; }
+
+  .contact-form-card { background: var(--white); border: 1.5px solid var(--gray-light); border-radius: var(--radius-lg); padding: 2rem; }
+  .contact-form-card h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; color: var(--black); margin-bottom: 1.5rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid var(--gray-light); border-radius: 8px;
+    font-family: var(--font-body); font-size: 14px; color: var(--charcoal);
+    background: var(--white); transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--green-mid); }
+  .form-group textarea { height: 100px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* FOOTER */
+  footer { background: var(--charcoal); color: white; padding: 4rem 2rem 2rem; }
+  .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+  .footer-brand .logo-text .daily, .footer-brand .logo-text .health { color: white; }
+  .footer-brand p { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 1rem; line-height: 1.6; }
+  .footer-col h4 { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 1rem; }
+  .footer-col a { display: block; color: rgba(255,255,255,0.75); font-size: 14px; text-decoration: none; margin-bottom: 8px; transition: color 0.2s; cursor: pointer; }
+  .footer-col a:hover { color: var(--green-bright); }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .footer-bottom p { font-size: 13px; color: rgba(255,255,255,0.4); }
+  .whatsapp-float {
+    position: fixed; bottom: 28px; right: 28px;
+    background: #25d366; color: white;
+    width: 58px; height: 58px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+    cursor: pointer; z-index: 1000;
+    transition: transform 0.2s;
+    text-decoration: none;
+  }
+  .whatsapp-float:hover { transform: scale(1.08); }
+  .whatsapp-float svg { width: 30px; height: 30px; fill: white; }
+
+  .typing { display: none; }
+  .typing.show { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--green-pale); border-radius: 14px; border-bottom-left-radius: 4px; width: 54px; border: 1px solid var(--green-light); }
+  .typing span { width: 7px; height: 7px; background: var(--green-mid); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  .notification { position: fixed; top: 90px; right: 24px; background: var(--green-mid); color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 200; transform: translateX(120%); transition: transform 0.3s; box-shadow: var(--shadow-md); }
+  .notification.show { transform: translateX(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" onclick="showPage('home')">
+      <div class="logo-icon"><div class="logo-cross"></div></div>
+      <div class="logo-text">
+        <div><span class="daily">DAILY </span><span class="health">HEALTH</span></div>
+        <div class="pharmacy">PHARMACY</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" id="nav-home" class="active" onclick="showPage('home');return false">Home</a></li>
+      <li><a href="#" id="nav-products" onclick="showPage('products');return false">Products</a></li>
+      <li><a href="#" id="nav-chat" onclick="showPage('chat');return false">AI Assistant</a></li>
+      <li><a href="#" id="nav-contact" onclick="showPage('contact');return false">Contact</a></li>
+      <li><a href="#" class="nav-cta" onclick="showPage('chat');return false">Order Now</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div id="notification" class="notification"></div>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-badge"><span></span> Serving Bulawayo Since 2010</div>
+        <h1>Your Health,<br><em>Our Priority</em><br>Every Day.</h1>
+        <p>Bulawayo's trusted pharmacy delivering quality medicines, health products, and expert advice — now with AI-powered assistance available 24/7 via WhatsApp.</p>
+        <div class="hero-btns">
+          <button class="btn-primary" onclick="showPage('products')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            Browse Products
+          </button>
+          <button class="btn-secondary" onclick="showPage('chat')">
+            Chat with AI Assistant
+          </button>
+        </div>
+      </div>
+      <div class="hero-card-wrap">
+        <div class="hero-card">
+          <h3>💬 AI Health Assistant</h3>
+          <div class="chat-bubble bot">Hello! I'm here to help with medicines, health advice, and orders. How can I assist you today?</div>
+          <div class="chat-bubble user">Do you have Panado in stock?</div>
+          <div class="chat-bubble bot">Yes! Panado 500mg is in stock at $1.50 per pack. Would you like to place an order?</div>
+          <div class="chat-input-demo">
+            <input type="text" placeholder="Ask about medicines..." readonly>
+            <button>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-band">
+    <div class="stats-inner">
+      <div><div class="stat-num">5,000+</div><div class="stat-label">Happy Customers</div></div>
+      <div><div class="stat-num">800+</div><div class="stat-label">Products Available</div></div>
+      <div><div class="stat-num">24/7</div><div class="stat-label">WhatsApp Support</div></div>
+      <div><div class="stat-num">14+</div><div class="stat-label">Years Serving Bulawayo</div></div>
+    </div>
+  </div>
+
+  <section class="features-section">
+    <p class="section-label">Why Choose Us</p>
+    <h2 class="section-title">Healthcare Made Convenient</h2>
+    <p class="section-sub">We combine trusted pharmaceutical expertise with modern technology to serve you better.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>Verified Medicines</h3>
+        <p>All products are MCAZ-approved and sourced from licensed suppliers. Quality you can trust every time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+        <h3>AI-Powered Chat</h3>
+        <p>Get instant answers about medicines, interactions, and health tips from our 24/7 AI health assistant.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <h3>Convenient Location</h3>
+        <p>Located at 90 Herbert Chitepo Street, CBD Bulawayo — right in the heart of the city for easy access.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+        </div>
+        <h3>WhatsApp Orders</h3>
+        <p>Order via WhatsApp and pay with EcoCash. Simple, fast, and familiar — no app downloads needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>EcoCash Payments</h3>
+        <p>Pay securely with EcoCash, ZIPIT, or cash. Transparent pricing with no hidden charges.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </div>
+        <h3>Expert Pharmacists</h3>
+        <p>Our qualified pharmacists provide personalised advice on dosing, interactions, and wellness.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PRODUCTS PAGE -->
+<div id="page-products" class="page">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h1>Our Products</h1>
+      <p>Quality medicines and health products — MCAZ approved, competitively priced.</p>
+    </div>
+  </div>
+  <div class="products-layout">
+    <aside class="filter-panel">
+      <h3>Categories</h3>
+      <div class="filter-item"><input type="radio" name="cat" id="all" checked><label for="all">All Products <span>(24)</span></label></div>
+      <div class="filter-item"><input type="radio" name="cat" id="pain"><label for="pain">Pain Relief <span>(6)</span></label></div>
+      <div class="filter-item"><input type="radio" name="cat" id="anti"><label for="anti">Antibiotics <span>(5)</span></label></div>
+      <div class="filter-item"><input type="radio" name="cat" id="vit"><label for="vit">Vitamins <span>(7)</span></label></div>
+      <div class="filter-item"><input type="radio" name="cat" id="skin"><label for="skin">Skincare <span>(3)</span></label></div>
+      <div class="filter-item"><input type="radio" name="cat" id="baby"><label for="baby">Baby & Mother <span>(3)</span></label></div>
+      <h3 style="margin-top:1.5rem">Availability</h3>
+      <div class="filter-item"><input type="checkbox" id="instock" checked><label for="instock">In Stock</label></div>
+      <div class="filter-item"><input type="checkbox" id="noRx"><label for="noRx">No Prescription</label></div>
+    </aside>
+    <div>
+      <div class="products-grid">
+        <!-- Product cards -->
+        <div class="product-card" onclick="addToCart('Panado 500mg','$1.50')">
+          <div class="product-img">
+            <svg viewBox="0 0 48 48" fill="none"><rect x="14" y="8" width="20" height="32" rx="4" fill="#c8e6c9"/><rect x="18" y="14" width="12" height="3" rx="1.5" fill="#2e7d32"/><rect x="20" y="20" width="8" height="2" rx="1" fill="#2e7d32"/><rect x="20" y="25" width="8" height="2" rx="1" fill="#2e7d32"/></svg>
+            <span class="product-badge">OTC</span>
+          </div>
+          <div class="product-body">
+            <div class="product-cat">Pain Relief</div>
+            <div class="product-name">Panado 500mg</div>
+            <div class="product-desc">Paracetamol tablets · Pack of 20</div>
+            <div class="product-footer">
+              <div class="product-price">$1.50 <span>/ pack</span></div>
+              <button class="add-btn">+ Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card" onclick="addToCart('Amoxicillin 500mg','$4.80')">
+          <div class="product-img">
+            <svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="24" rx="10" ry="6" fill="#c8e6c9"/><ellipse cx="24" cy="24" rx="10" ry="6" fill="none" stroke="#2e7d32" stroke-width="1.5"/><rect x="22" y="12" width="4" height="24" rx="2" fill="#2e7d32" opacity="0.3"/></svg>
+            <span class="product-badge rx">Rx</span>
+          </div>
+          <div class="product-body">
+            <div class="product-cat">Antibiotics</div>
+            <div class="product-name">Amoxicillin 500mg</div>
+            <div class="product-desc">Capsules · Pack of 21</div>
+            <div class="product-footer">
+              <div class="product-price">$4.80 <span>/ pack</span></div>
+              <button class="add-btn">+ Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card" onclick="addToCart('Vitamin C 1000mg','$3.20')">
+          <div class="product-img">
+            <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="14" fill="#fff9c4"/><circle cx="24" cy="24" r="14" stroke="#f9a825" stroke-width="1.5"/><text x="24" y="29" text-anchor="middle" font-size="13" font-weight="700" fill="#f57f17">C</text></svg>
+            <span class="product-badge">OTC</span>
+          </div>
+          <div class="product-body">
+            <div class="product-cat">Vitamins</div>
+            <div class="product-name">Vitamin C 1000mg</div>
+            <div class="product-desc">Effervescent tablets · 20 tabs</div>
+            <div class="product-footer">
+              <div class="product-price">$3.20 <span>/ tube</span></div>
+              <button class="add-btn">+ Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card" onclick="addToCart('Ibuprofen 400mg','$2.10')">
+          <div class="product-img">
+            <svg viewBox="0 0 48 48" fill="none"><rect x="14" y="8" width="20" height="32" rx="4" fill="#ffcdd2"/><rect x="18" y="18" width="12" height="3" rx="1.5" fill="#c62828"/><rect x="20" y="24" width="8" height="2" rx="1" fill="#c62828"/></svg>
+            <span class="product-badge">OTC</span>
+          </div>
+          <div class="product-body">
+            <div class="product-cat">Pain Relief</div>
+            <div class="product-name">Ibuprofen 400mg</div>
+            <div class="product-desc">Anti-inflammatory tablets · 24 tabs</div>
+            <div class="product-footer">
+              <div class="product-price">$2.10 <span>/ pack</span></div>
+              <button class="add-btn">+ Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card" onclick="addToCart('Zinc + Multivitamin','$5.50')">
+          <div class="product-img">
+            <svg viewBox="0 0 48 48" fill="none"><rect x="10" y="18" width="28" height="14" rx="7" fill="#c8e6c9"/><rect x="10" y="18" width="14" height="14" rx="7" fill="#2e7d32"/></svg>
+            <span class="product-badge">OTC</span>
+          </div>
+          <div class="product-body">
+            <div class="product-cat">Vitamins</div>
+            <div class="product-name">Zinc + Multivitamin</div>
+            <div class="product-desc">Immune support · 30 capsules</div>
+            <div class="product-footer">
+              <div class="product-price">$5.50 <span>/ bottle</span></div>
+              <button class="add-btn">+ Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card" onclick="addToCart('Oral Rehydration Salts','$0.90')">
+          <div class="product-img">
+            <svg viewBox="0 0 48 48" fill="none"><path d="M18 36 C18 36 14 30 14 24 C14 18 18 12 24 12 C30 12 34 18 34 24 C34 30 30 36 30 36 Z" fill="#e3f2fd"/><path d="M18 36 C18 36 14 30 14 24 C14 18 18 12 24 12 C30 12 34 18 34 24 C34 30 30 36 30 36 Z" fill="none" stroke="#1565c0" stroke-width="1.5"/></svg>
+            <span class="product-badge">OTC</span>
+          </div>
+          <div class="product-body">
+            <div class="product-cat">Wellness</div>
+            <div class="product-name">ORS Sachets</div>
+            <div class="product-desc">Oral Rehydration Salts · 10 sachets</div>
+            <div class="product-footer">
+              <div class="product-price">$0.90 <span>/ pack</span></div>
+              <button class="add-btn">+ Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT PAGE -->
+<div id="page-chat" class="page">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h1>AI Health Assistant</h1>
+      <p>Get instant answers about medicines, stock, and health advice — 24 hours a day.</p>
+    </div>
+  </div>
+  <div class="chat-page-layout">
+    <div class="chat-header-card">
+      <div class="chat-avatar">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div class="chat-header-info">
+        <h2>Daily Health AI Assistant</h2>
+        <p><span class="online-dot"></span>Online now · Powered by Groq AI · Always available</p>
+      </div>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+      <div class="msg bot">
+        <div class="msg-sender">Daily Health</div>
+        <div class="msg-bubble">Hello! Welcome to Daily Health Pharmacy. I can help you with medicine information, check stock availability, provide health tips, and assist with placing orders. How can I help you today?</div>
+        <div class="msg-time">Just now</div>
+      </div>
+    </div>
+
+    <div class="typing" id="typingIndicator">
+      <span></span><span></span><span></span>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea id="chatInput" placeholder="Ask about a medicine, symptom, or place an order..." onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="quick-chips">
+      <div class="chip" onclick="quickSend('Do you have Panado in stock?')">Stock check</div>
+      <div class="chip" onclick="quickSend('What are your opening hours?')">Opening hours</div>
+      <div class="chip" onclick="quickSend('How do I order via WhatsApp?')">WhatsApp orders</div>
+      <div class="chip" onclick="quickSend('What is good for a headache?')">Headache remedy</div>
+      <div class="chip" onclick="quickSend('Do you accept EcoCash?')">Payment methods</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT PAGE -->
+<div id="page-contact" class="page">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h1>Contact Us</h1>
+      <p>We're here to help. Visit us, call us, or send a message.</p>
+    </div>
+  </div>
+  <div class="contact-layout">
+    <div class="contact-info">
+      <h2>Get in Touch</h2>
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <div>
+          <h4>Our Address</h4>
+          <p>90 Herbert Chitepo Street<br>CBD, Bulawayo, Zimbabwe</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+        </div>
+        <div>
+          <h4>Phone</h4>
+          <p>+263 9 XXXXXXX<br>+263 77 XXX XXXX (WhatsApp)</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+          <h4>Email</h4>
+          <p>info@dailyhealthpharmacy.co.zw</p>
+        </div>
+      </div>
+      <div class="hours-card">
+        <h3>Trading Hours</h3>
+        <div class="hours-row"><span class="day">Monday – Friday</span><span class="time">7:30 AM – 6:00 PM <span class="open-now">Open</span></span></div>
+        <div class="hours-row"><span class="day">Saturday</span><span class="time">8:00 AM – 5:00 PM</span></div>
+        <div class="hours-row"><span class="day">Sunday & Public Holidays</span><span class="time">9:00 AM – 1:00 PM</span></div>
+        <div class="hours-row"><span class="day">WhatsApp Orders</span><span class="time">24 / 7</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="contact-form-card">
+        <h2>Send a Message</h2>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" placeholder="John"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" placeholder="Moyo"></div>
+        </div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+263 77 XXX XXXX"></div>
+        <div class="form-group"><label>Subject</label>
+          <select>
+            <option>Medicine enquiry</option>
+            <option>Order status</option>
+            <option>Prescription submission</option>
+            <option>General question</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Message</label><textarea placeholder="How can we help you?"></textarea></div>
+        <button class="btn-primary" style="width:100%;justify-content:center" onclick="showToast('Message sent! We will respond shortly.')">Send Message</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <div class="logo-icon"><div class="logo-cross"></div></div>
+        <div class="logo-text">
+          <div><span class="daily">DAILY </span><span class="health">HEALTH</span></div>
+          <div class="pharmacy">PHARMACY</div>
+        </div>
+      </div>
+      <p>Bulawayo's trusted pharmacy. Quality medicines, expert advice, and AI-powered health assistance — serving you since 2010.</p>
+      <p style="margin-top:0.75rem;font-size:12px;color:rgba(255,255,255,0.4)">90 Herbert Chitepo Street, CBD, Bulawayo</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <a onclick="showPage('products')">Buy Medicines</a>
+      <a onclick="showPage('chat')">AI Assistant</a>
+      <a>Prescription Filling</a>
+      <a>Health Advice</a>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <a onclick="showPage('products')">Pain Relief</a>
+      <a onclick="showPage('products')">Antibiotics</a>
+      <a onclick="showPage('products')">Vitamins</a>
+      <a onclick="showPage('products')">Baby Care</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a onclick="showPage('contact')">Contact Us</a>
+      <a>About Us</a>
+      <a>Privacy Policy</a>
+      <a onclick="showPage('chat')">WhatsApp Orders</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Daily Health Pharmacy · Bulawayo, Zimbabwe</p>
+    <p style="color:rgba(255,255,255,0.3);font-size:12px">MCAZ Licensed · All products approved</p>
+  </div>
+</footer>
+
+<a class="whatsapp-float" href="#" onclick="showToast('Redirecting to WhatsApp...');return false" title="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showToast(msg) {
+  const n = document.getElementById('notification');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+function addToCart(name, price) {
+  showToast(name + ' added to cart — ' + price);
+}
+
+const botResponses = {
+  'panado': 'Yes, Panado 500mg (Paracetamol) is in stock at $1.50 per pack of 20 tablets. It is available over-the-counter — no prescription needed. Would you like to place an order?',
+  'stock': 'We carry over 800 products including pain relief, antibiotics, vitamins, skincare, and baby products. What specific medicine are you looking for?',
+  'hours': 'Our trading hours are: Monday–Friday 7:30 AM–6:00 PM, Saturday 8:00 AM–5:00 PM, Sunday & Public Holidays 9:00 AM–1:00 PM. WhatsApp orders are accepted 24/7!',
+  'whatsapp': 'To order via WhatsApp: 1) Message us on our WhatsApp number. 2) Tell us what medicine you need. 3) We confirm availability and price. 4) Pay via EcoCash. 5) Collect in-store or arrange delivery. Simple and easy!',
+  'headache': 'For headaches, we recommend Panado 500mg ($1.50) or Ibuprofen 400mg ($2.10). Both are available without a prescription. Please note: if headaches are severe or frequent, consult a healthcare professional. Would you like to order either?',
+  'ecocash': 'Yes, we accept EcoCash, ZIPIT, and cash. For WhatsApp orders, we use EcoCash for convenient mobile payment before collection or delivery.',
+  'address': 'We are located at 90 Herbert Chitepo Street, CBD, Bulawayo. We are easy to find right in the city centre!',
+  'default': 'Thank you for your question! For detailed medical advice, please speak with one of our pharmacists in-store or call us. For product availability and orders, I am happy to help. What product are you looking for?'
+};
+
+function getBotReply(msg) {
+  const lower = msg.toLowerCase();
+  if (lower.includes('panado') || lower.includes('paracetamol')) return botResponses['panado'];
+  if (lower.includes('stock') || lower.includes('available') || lower.includes('have')) return botResponses['stock'];
+  if (lower.includes('hour') || lower.includes('open') || lower.includes('close') || lower.includes('time')) return botResponses['hours'];
+  if (lower.includes('whatsapp') || lower.includes('order')) return botResponses['whatsapp'];
+  if (lower.includes('headache') || lower.includes('pain') || lower.includes('head')) return botResponses['headache'];
+  if (lower.includes('ecocash') || lower.includes('pay') || lower.includes('payment')) return botResponses['ecocash'];
+  if (lower.includes('address') || lower.includes('where') || lower.includes('location')) return botResponses['address'];
+  return botResponses['default'];
+}
+
+function addMsg(role, text) {
+  const win = document.getElementById('chatWindow');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const now = new Date().toLocaleTimeString('en-ZW', {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = (role === 'bot' ? '<div class="msg-sender">Daily Health</div>' : '') +
+    '<div class="msg-bubble">' + text + '</div>' +
+    '<div class="msg-time">' + now + '</div>';
+  win.appendChild(div);
+  win.scrollTop = win.scrollHeight;
+}
+
+function sendMessage() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  document.getElementById('sendBtn').disabled = true;
+  addMsg('user', msg);
+  const typer = document.getElementById('typingIndicator');
+  typer.classList.add('show');
+  setTimeout(() => {
+    typer.classList.remove('show');
+    addMsg('bot', getBotReply(msg));
+    document.getElementById('sendBtn').disabled = false;
+  }, 1200 + Math.random() * 800);
+}
+
+function quickSend(msg) {
+  document.getElementById('chatInput').value = msg;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+</script>
+</body>
+</html>

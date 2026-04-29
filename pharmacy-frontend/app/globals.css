@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+
+:root {
+  --green-dark: #1e5c1e;
+  --green-mid: #2e7d32;
+  --green-bright: #43a047;
+  --green-light: #c8e6c9;
+  --green-pale: #f1f8f1;
+  --red-cross: #c62828;
+  --red-light: #ffebee;
+  --black: #111111;
+  --charcoal: #2a2a2a;
+  --gray-dark: #555;
+  --gray-mid: #888;
+  --gray-light: #e8e8e8;
+  --gray-pale: #f7f7f5;
+  --white: #ffffff;
+  --silver: #b0b0b0;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.16);
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font-body);
+  color: var(--charcoal);
+  background: var(--white);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-pale); }
+::-webkit-scrollbar-thumb { background: var(--green-light); border-radius: 3px; }
+
+/* ── Typography helpers ── */
+.font-display { font-family: var(--font-display); }
+
+/* ── Buttons ── */
+.btn-primary {
+  background: var(--green-mid);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover {
+  background: var(--green-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(46,125,50,0.3);
+}
+.btn-secondary {
+  background: white;
+  color: var(--green-mid);
+  padding: 14px 28px;
+  border-radius: 8px;
+  border: 2px solid var(--green-mid);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-secondary:hover { background: var(--green-pale); }
+
+/* ── Typing animation ── */
+@keyframes bounce {
+  0%,60%,100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
