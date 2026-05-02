@@ -62,3 +62,36 @@ body { font-family: var(--font-body); color: var(--charcoal); background: var(--
 
 @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── MOBILE RESPONSIVENESS ── */
+@media (max-width: 768px) {
+  .btn-primary, .btn-secondary {
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Stats band */
+  div[style*="repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* Features grid */
+  div[style*="repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* Hero grid */
+  div[style*="1fr 440px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  div[style*="repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+  section[style*="5rem 2rem"] {
+    padding: 3rem 1rem !important;
+  }
+}
