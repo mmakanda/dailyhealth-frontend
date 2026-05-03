@@ -60,36 +60,25 @@ export default function HomePage() {
 
       {/* ── HERO WITH VIDEO BACKGROUND ── */}
       <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
-        {/* Fallback background - always visible */}
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 0,
-          background: "linear-gradient(135deg, #0d3d0d 0%, #1e6b1e 40%, #2d7d2d 70%, #1a4a1a 100%)",
-        }} />
-        {/* Subtle pattern overlay */}
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 1, opacity: 0.04,
-          backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }} />
-        {/* Video background - loads on top if available */}
-        <video
-          autoPlay muted loop playsInline
+        {/* Hero background photo - real pharmacy stock photo */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg?auto=compress&cs=tinysrgb&w=1600"
+          alt=""
           style={{
             position: "absolute", inset: 0, width: "100%", height: "100%",
-            objectFit: "cover", zIndex: 2, opacity: 0.7,
+            objectFit: "cover", zIndex: 0,
           }}
-        >
-          <source src="https://videos.pexels.com/video-files/6740793/6740793-hd_1920_1080_25fps.mp4" type="video/mp4" />
-        </video>
-        {/* Dark overlay */}
+        />
+        {/* Dark green overlay for readability */}
         <div style={{
-          position: "absolute", inset: 0, zIndex: 3,
-          background: "linear-gradient(135deg, rgba(5,30,5,0.75) 0%, rgba(15,60,15,0.60) 50%, rgba(0,0,0,0.55) 100%)",
+          position: "absolute", inset: 0, zIndex: 1,
+          background: "linear-gradient(135deg, rgba(5,30,5,0.80) 0%, rgba(15,55,15,0.70) 50%, rgba(0,0,0,0.60) 100%)",
         }} />
 
         {/* Content */}
         <div style={{
-          position: "relative", zIndex: 4,
+          position: "relative", zIndex: 3,
           maxWidth: 1200, margin: "0 auto", padding: "7rem 2rem 5rem",
           display: "grid", gridTemplateColumns: "1fr auto", gap: "4rem", alignItems: "center",
           width: "100%",
@@ -192,7 +181,7 @@ export default function HomePage() {
         {/* Scroll indicator */}
         <div style={{
           position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)",
-          zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+          zIndex: 3, display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
           animation: "heroFade 1s 3s both",
         }}>
           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: 2, textTransform: "uppercase" }}>Scroll</span>
