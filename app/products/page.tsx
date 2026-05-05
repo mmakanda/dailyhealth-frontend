@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import WhatsAppFloat from "../components/WhatsAppFloat";
 import { getProducts, type Product } from "../lib/api";
+import { useCart } from "../components/Cart";
 
 const CATEGORIES = ["All", "Pain Relief", "Antibiotics", "Vitamins", "Skincare", "Baby & Mother", "Wellness"];
 
@@ -135,6 +136,7 @@ function FilterPanel({ products, activeCategory, setActiveCategory, inStockOnly,
 }
 
 export default function ProductsPage() {
+  const { addItem } = useCart();
   const [products, setProducts] = useState<(Product & { category: string; unit: string; badge: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -224,7 +226,10 @@ export default function ProductsPage() {
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.5rem" }}>
               {filtered.map((p) => (
-                <ProductCard key={p.id} product={p} onAddToCart={() => showToast(`${p.name} added - $${p.price.toFixed(2)}`)} />
+                <ProductCard key={p.id} product={p} onAddToCart={() => {
+                  addItem({ id: p.id, name: p.name, price: p.price });
+                  showToast(`${p.name} added to cart`);
+                }} />
               ))}
             </div>
           )}
