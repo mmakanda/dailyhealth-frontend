@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import WhatsAppFloat from "../components/WhatsAppFloat";
-import { sendChatMessage } from "../lib/api";
+import { sendChatMessage, type ChatHistory } from "../lib/api";
 
 interface Message {
   role: "bot" | "user";
@@ -53,7 +53,11 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      const response = await sendChatMessage(text);
+      const history: ChatHistory[] = messages.map((m) => ({
+        role: m.role === "user" ? "user" : "assistant",
+        content: m.text,
+      }));
+      const response = await sendChatMessage(text, history);
       setMessages((prev) => [...prev, { role: "bot", text: response, time: nowTime() }]);
     } catch {
       setMessages((prev) => [
