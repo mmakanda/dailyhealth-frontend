@@ -61,7 +61,7 @@ export default function ContactPage() {
             {
               icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
               title: "Phone",
-              lines: ["+263 9 XXXXXXX", "+263 77 XXX XXXX (WhatsApp)"],
+              lines: ["+263 78 617 6284", "+263 78 617 6284 (WhatsApp)"],
             },
             {
               icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
@@ -114,7 +114,7 @@ export default function ContactPage() {
             <FormField label="First Name" value={form.firstName} placeholder="John" onChange={(v) => setForm({ ...form, firstName: v })} />
             <FormField label="Last Name" value={form.lastName} placeholder="Moyo" onChange={(v) => setForm({ ...form, lastName: v })} />
           </div>
-          <FormField label="Phone Number" value={form.phone} placeholder="+263 77 XXX XXXX" onChange={(v) => setForm({ ...form, phone: v })} type="tel" />
+          <FormField label="Phone Number" value={form.phone} placeholder="+263 78 617 6284" onChange={(v) => setForm({ ...form, phone: v })} type="tel" />
 
           <div style={{ marginBottom: "1.25rem" }}>
             <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--charcoal)", marginBottom: 6, letterSpacing: 0.3 }}>Subject</label>
