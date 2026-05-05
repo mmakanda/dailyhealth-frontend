@@ -63,7 +63,7 @@ export default function HomePage() {
         {/* Hero background photo - real pharmacy stock photo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.pexels.com/photos/8460157/pexels-photo-8460157.jpeg?auto=compress&cs=tinysrgb&w=1600"
+          src="/hero.png"
           alt=""
           style={{
             position: "absolute", inset: 0, width: "100%", height: "100%",
