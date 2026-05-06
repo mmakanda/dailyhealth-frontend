@@ -227,7 +227,7 @@ export default function ProductsPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.5rem" }}>
               {filtered.map((p) => (
                 <ProductCard key={p.id} product={p} onAddToCart={() => {
-                  addItem({ id: p.id, name: p.name, price: p.price });
+                  addItem({ id: p.id, name: p.name, price: p.price, requiresRx: p.badge === "Rx" });
                   showToast(`${p.name} added to cart`);
                 }} />
               ))}
