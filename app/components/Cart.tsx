@@ -23,7 +23,6 @@ const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-
   function addItem(item: Omit<CartItem, "quantity">) {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
@@ -31,19 +30,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...prev, { ...item, quantity: 1 }];
     });
   }
-
   function removeItem(id: number) { setItems((prev) => prev.filter((i) => i.id !== id)); }
-
   function updateQty(id: number, qty: number) {
     if (qty < 1) { removeItem(id); return; }
     setItems((prev) => prev.map((i) => i.id === id ? { ...i, quantity: qty } : i));
   }
-
   function clearCart() { setItems([]); }
-
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
-
   return (
     <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, total, count }}>
       {children}
@@ -57,6 +51,21 @@ export function useCart() {
   return ctx;
 }
 
+async function verifyPrescription(file: File): Promise<{ valid: boolean; reason: string }> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/prescriptions/verify`,
+      { method: "POST", body: formData }
+    );
+    if (!response.ok) throw new Error("Server error");
+    return await response.json();
+  } catch {
+    return { valid: false, reason: "Verification failed. Please try a clearer image." };
+  }
+}
+
 function RxUploadModal({ onConfirm, onSkip, onClose }: {
   onConfirm: (file: File) => void;
   onSkip: () => void;
@@ -65,12 +74,25 @@ function RxUploadModal({ onConfirm, onSkip, onClose }: {
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<{ valid: boolean; reason: string } | null>(null);
 
   function handleFile(f: File) {
     setFile(f);
+    setVerifyResult(null);
     const reader = new FileReader();
     reader.onload = (e) => setPreview(e.target?.result as string);
     reader.readAsDataURL(f);
+  }
+
+  async function handleVerifyAndSubmit() {
+    if (!file) return;
+    setVerifying(true);
+    setVerifyResult(null);
+    const result = await verifyPrescription(file);
+    setVerifying(false);
+    setVerifyResult(result);
+    if (result.valid) onConfirm(file);
   }
 
   return (
@@ -84,16 +106,15 @@ function RxUploadModal({ onConfirm, onSkip, onClose }: {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
           <div>
             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "1.3rem", color: "var(--black)" }}>Prescription Required</h2>
-            <p style={{ fontSize: 13, color: "var(--gray-dark)", marginTop: 4 }}>Your cart contains items that require a prescription.</p>
+            <p style={{ fontSize: 13, color: "var(--gray-dark)", marginTop: 4 }}>Upload your prescription — our AI will verify it before proceeding.</p>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--gray-mid)", marginLeft: 12 }}>x</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--gray-mid)", marginLeft: 12 }}>×</button>
         </div>
 
         <div style={{
-          border: "2px dashed var(--green-light)", borderRadius: "var(--radius)",
-          padding: "1.5rem", textAlign: "center", marginBottom: "1rem",
-          background: preview ? "var(--green-pale)" : "white", cursor: "pointer",
-          transition: "all 0.2s",
+          border: `2px dashed ${verifyResult?.valid === false ? "#ef4444" : verifyResult?.valid ? "#22c55e" : "var(--green-light)"}`,
+          borderRadius: "var(--radius)", padding: "1.5rem", textAlign: "center", marginBottom: "1rem",
+          background: preview ? "var(--green-pale)" : "white", cursor: "pointer", transition: "all 0.2s",
         }}
           onClick={() => fileRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
@@ -103,10 +124,8 @@ function RxUploadModal({ onConfirm, onSkip, onClose }: {
             <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={preview} alt="Prescription preview"
-                style={{ maxHeight: 180, maxWidth: "100%", borderRadius: 8, objectFit: "contain" }} />
-              <p style={{ fontSize: 12, color: "var(--green-mid)", marginTop: 8, fontWeight: 600 }}>
-                {file?.name}
-              </p>
+                style={{ maxHeight: 160, maxWidth: "100%", borderRadius: 8, objectFit: "contain" }} />
+              <p style={{ fontSize: 12, color: "var(--green-mid)", marginTop: 8, fontWeight: 600 }}>{file?.name}</p>
             </div>
           ) : (
             <div>
@@ -114,33 +133,51 @@ function RxUploadModal({ onConfirm, onSkip, onClose }: {
                 <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <p style={{ fontSize: 14, fontWeight: 600, color: "var(--charcoal)" }}>Tap to upload prescription</p>
-              <p style={{ fontSize: 12, color: "var(--gray-mid)", marginTop: 4 }}>Photo or scan — JPG, PNG, PDF accepted</p>
+              <p style={{ fontSize: 12, color: "var(--gray-mid)", marginTop: 4 }}>Photo or scan — JPG, PNG accepted</p>
             </div>
           )}
-          <input ref={fileRef} type="file" accept="image/*,.pdf" style={{ display: "none" }}
+          <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         </div>
 
+        {verifyResult && (
+          <div style={{
+            background: verifyResult.valid ? "#f0fdf4" : "#fef2f2",
+            border: `1px solid ${verifyResult.valid ? "#86efac" : "#fca5a5"}`,
+            borderRadius: 8, padding: "10px 14px", marginBottom: "1rem",
+            fontSize: 13, color: verifyResult.valid ? "#166534" : "#991b1b",
+            display: "flex", alignItems: "center", gap: 8,
+          }}>
+            <span style={{ fontSize: 16 }}>{verifyResult.valid ? "✅" : "❌"}</span>
+            <span>{verifyResult.reason}</span>
+          </div>
+        )}
+
         <div style={{ background: "var(--green-pale)", border: "1px solid var(--green-light)", borderRadius: 8, padding: "10px 14px", marginBottom: "1.25rem", fontSize: 13, color: "var(--gray-dark)" }}>
-          Your prescription will be sent via WhatsApp along with your order for verification by our pharmacist.
+          After verification your order opens in WhatsApp. <strong>Please also send the prescription photo directly in that WhatsApp chat</strong> for pharmacist review.
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <button
-            onClick={() => file && onConfirm(file)}
-            disabled={!file}
-            style={{
-              background: file ? "var(--green-mid)" : "var(--gray-light)",
-              color: file ? "white" : "var(--gray-mid)",
-              border: "none", borderRadius: 8, padding: "13px",
-              fontSize: 14, fontWeight: 700, cursor: file ? "pointer" : "not-allowed",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            }}
-          >
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.355A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" />
-            </svg>
-            Send Order with Prescription
+          <button onClick={handleVerifyAndSubmit} disabled={!file || verifying} style={{
+            background: file && !verifying ? "var(--green-mid)" : "var(--gray-light)",
+            color: file && !verifying ? "white" : "var(--gray-mid)",
+            border: "none", borderRadius: 8, padding: "13px",
+            fontSize: 14, fontWeight: 700, cursor: file && !verifying ? "pointer" : "not-allowed",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          }}>
+            {verifying ? (
+              <>
+                <span style={{ display: "inline-block", width: 16, height: 16, border: "2px solid white", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                Verifying prescription…
+              </>
+            ) : (
+              <>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verify & Send Order
+              </>
+            )}
           </button>
           <button onClick={onSkip} style={{
             background: "none", border: "1.5px solid var(--gray-light)", borderRadius: 8,
@@ -149,6 +186,7 @@ function RxUploadModal({ onConfirm, onSkip, onClose }: {
             Continue without prescription (OTC items only)
           </button>
         </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     </div>
   );
@@ -162,7 +200,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const rxItems = items.filter((i) => i.requiresRx);
   const otcItems = items.filter((i) => !i.requiresRx);
 
-  function buildWhatsAppMsg(prescriptionNote?: string) {
+  function buildWhatsAppMsg(includeRxNote: boolean) {
     const lines = items.map((i) => `- ${i.name} x${i.quantity} = $${(i.price * i.quantity).toFixed(2)}${i.requiresRx ? " [Rx]" : ""}`);
     return [
       "Hello Daily Health Pharmacy, I would like to place an order:",
@@ -170,27 +208,26 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       ...lines,
       "",
       `Total: $${total.toFixed(2)}`,
-      prescriptionNote || "",
+      includeRxNote ? "%0A⚠️ Prescription verified — sending photo now in this chat." : "",
       "",
       "Please confirm availability and payment details. Thank you.",
     ].filter(Boolean).join("%0A");
   }
 
-  function handleCheckout() {
-    if (hasRx) { setShowRxModal(true); return; }
-    sendOrder();
-  }
-
-  function sendOrder(prescriptionNote?: string) {
-    window.open(`https://wa.me/263786176284?text=${buildWhatsAppMsg(prescriptionNote)}`, "_blank");
+  function sendOrder(includeRxNote: boolean) {
+    window.open(`https://wa.me/263786176284?text=${buildWhatsAppMsg(includeRxNote)}`, "_blank");
     clearCart();
     onClose();
   }
 
-  function handleRxConfirm(file: File) {
+  function handleCheckout() {
+    if (hasRx) { setShowRxModal(true); return; }
+    sendOrder(false);
+  }
+
+  function handleRxConfirm(_file: File) {
     setShowRxModal(false);
-    const note = `Prescription uploaded: ${file.name} (please request the image via WhatsApp)`;
-    sendOrder(note);
+    sendOrder(true);
   }
 
   function handleRxSkip() {
@@ -203,7 +240,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       "",
       `Total: $${otcItems.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}`,
       "",
-      `Note: ${rxItems.map(i => i.name).join(", ")} removed as no prescription available.`,
+      `Note: ${rxItems.map(i => i.name).join(", ")} removed — no prescription available.`,
       "",
       "Please confirm availability and payment. Thank you.",
     ].join("%0A");
@@ -217,11 +254,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <>
       {showRxModal && (
-        <RxUploadModal
-          onConfirm={handleRxConfirm}
-          onSkip={handleRxSkip}
-          onClose={() => setShowRxModal(false)}
-        />
+        <RxUploadModal onConfirm={handleRxConfirm} onSkip={handleRxSkip} onClose={() => setShowRxModal(false)} />
       )}
       <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", justifyContent: "flex-end" }}>
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} onClick={onClose} />
@@ -234,7 +267,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.3rem", color: "var(--black)" }}>
               Your Cart {count > 0 && <span style={{ fontSize: 14, background: "var(--green-mid)", color: "white", borderRadius: 12, padding: "2px 8px", marginLeft: 8 }}>{count}</span>}
             </h2>
-            <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "var(--gray-mid)" }}>x</button>
+            <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "var(--gray-mid)" }}>×</button>
           </div>
 
           <div style={{ flex: 1, overflowY: "auto", padding: "1rem" }}>
@@ -249,7 +282,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
               <>
                 {hasRx && (
                   <div style={{ background: "#fff3e0", border: "1px solid #ffcc80", borderRadius: 8, padding: "10px 12px", marginBottom: "1rem", fontSize: 13, color: "#e65100" }}>
-                    Your cart contains prescription items. You will be asked to upload a prescription at checkout.
+                    Your cart contains prescription items. You will need to upload and verify a prescription at checkout.
                   </div>
                 )}
                 {items.map((item) => (
@@ -266,7 +299,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                       <span style={{ fontSize: 14, fontWeight: 700, minWidth: 20, textAlign: "center" }}>{item.quantity}</span>
                       <button onClick={() => updateQty(item.id, item.quantity + 1)} style={{ width: 28, height: 28, border: "1.5px solid var(--green-light)", borderRadius: 6, background: "white", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
                     </div>
-                    <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gray-mid)", fontSize: 18, padding: "0 4px" }}>x</button>
+                    <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gray-mid)", fontSize: 18, padding: "0 4px" }}>×</button>
                   </div>
                 ))}
               </>
