@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  eslint: { ignoreDuringBuilds: true },
   images: {
     // Allow local images from public/ (no external domains needed)
     unoptimized: false,

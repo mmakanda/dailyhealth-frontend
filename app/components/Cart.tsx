@@ -229,7 +229,7 @@ function RxSendReminderModal({ onClose }: { onClose: () => void }) {
           border: "none", borderRadius: 8, padding: "13px",
           fontSize: 14, fontWeight: 700, cursor: "pointer",
         }}>
-          Got it, I'll send the photo now
+          Got it, IGot it, I'll send the photo nowapos;ll send the photo now
         </button>
       </div>
     </div>
