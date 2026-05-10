@@ -2,15 +2,31 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
+  poweredByHeader: false,
   images: {
-    // Allow local images from public/ (no external domains needed)
     unoptimized: false,
   },
   async headers() {
     return [
       {
-        source: "/api/:path*",
-        headers: [{ key: "Access-Control-Allow-Origin", value: "*" }],
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options",           value: "DENY" },
+          { key: "X-Content-Type-Options",     value: "nosniff" },
+          { key: "Referrer-Policy",            value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy",         value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob:",
+              "font-src 'self'",
+              "connect-src 'self' https://dailyhealth-backend-production.up.railway.app",
+            ].join("; ")
+          },
+        ],
       },
     ];
   },
